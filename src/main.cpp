@@ -2,6 +2,8 @@
 #include "config.h"     // loads DHTPIN, TFT_CS, TFT_DC, etc.
 #include "sensors.h"  // loads DHT, BMP085, BH1750, RTC_DS3231
 #include "wifi_utils.h"
+#include "tasks.h" 
+#include "globals.h"
 
 #include <Adafruit_GFX.h>
 #include <Adafruit_ST7789.h>
@@ -16,39 +18,8 @@ void printDHT();
 void printBHT();
 void tftPrintWeather();
 
-// Loop counter
-unsigned int count = 0;
-  
-// Wifi settings
-const char* ssid = "Totalplay-BBA5";
-const char* password = "BBA5DBC89x7wCcvU";
 
-// RTC
-char daysOfTheWeek[7][12] = {"Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"};
-DateTime now;
-float RTCtemp = 0.0f;    // Temperature in °C from RTC
-// DHT22
-float temp = 0.0f;       // Temperature in °C
-float hum = 0.0f;        // Humidity en %
-float feels_like = 0.0f; // "Feels like" temperature in °C
-// BMP180
-float pres = 0.0f;       // Pressure in hPa (Pa to hPa)
-float alt = 0.0f;        // Altitude in m
-float BMPtemp = 0.0f;    // Temperature in °C from BMP180
-float seaLevelPres = 101325.0f; // Sea level pressure in Pa (default 1013.25 hPa)
-// BH1750
-float lux = 0.0f;        // Light level in lux
-
-// Fields for ThingSpeak
-float fields[7] = {
-  0.0f, // Field 1: temp
-  0.0f, // Field 2: hum
-  0.0f, // Field 3: pres
-  0.0f, // Field 4: alt
-  0.0f, // Field 5: BMPtemp
-  0.0f, // Field 6: feels_like
-  0.0f, // Field 7: lux
-};
+unsigned long ttf_timer = 0;  // borrar cuando se pase a GUI
 
 void setup()
 {
@@ -68,67 +39,32 @@ void setup()
   tft.setFont(&FreeSans9pt7b);
 }
 
-void loop()
-{
-  count++;
-  Serial.print("Contador: ");
-  Serial.println(count);
+void loop() {
+  curr_time = millis();
+  taskDHT(curr_time);
+  taskBMP(curr_time);
+  taskBH1750(curr_time);
+  taskRTC(curr_time);
+  taskThingSpeak(curr_time);
+  
+  // Hay que pasar la función de impresión a una tarea, pero no lo he hecho porque quiero cambiar a una gui
+  if (curr_time - ttf_timer >= 1000) {
+    ttf_timer = curr_time;
+    printTime();
+    printBMP();
+    printDHT();
+    printBHT();
+    Serial.println("----------------------------------------");
+    Serial.println();
 
-  digitalWrite(LED_BUILTIN, HIGH);
+    // tftPrintTime(); 
+    // tftPrintBMP();
+    // tftPrintDHT();
+    // tftPrintBHT();
 
-  delay(1000);
-
-  digitalWrite(LED_BUILTIN, LOW);
-
-  if (lux < 300) {
-    digitalWrite(LED_RED, HIGH);
-    digitalWrite(LED_YELLOW, LOW);
-    digitalWrite(LED_GREEN, LOW);
-  } else if (lux < 3000) {
-    digitalWrite(LED_RED, LOW);
-    digitalWrite(LED_YELLOW, HIGH);
-    digitalWrite(LED_GREEN, LOW);
-  } else {
-    digitalWrite(LED_RED, LOW);
-    digitalWrite(LED_YELLOW, LOW);
-    digitalWrite(LED_GREEN, HIGH);
+    tftPrintWeather();
   }
 
-  Serial.println("----------------------------------------");
-  if (!readDHT(temp, hum, feels_like)) {
-    Serial.println("Error leyendo DHT22");
-  }
-  readBMP(BMPtemp, pres, alt, seaLevelPres);
-  readBH1750(lux);
-  readRTC(now, RTCtemp);
-
-  // Actualiza los campos para ThingSpeak
-  if (count % 5 == 0) {
-    fields[0] = temp;          // Field 1: temp
-    fields[1] = hum;           // Field 2: hum
-    fields[2] = pres;          // Field 3: pres
-    fields[3] = alt;           // Field 4: alt
-    fields[4] = BMPtemp;       // Field 5: BMPtemp
-    fields[5] = feels_like;    // Field 6: feels_like
-    fields[6] = lux;           // Field 7: lux
-    sendToThingSpeak(fields);
-  }
-
-  printTime();
-  printBMP();
-  printDHT();
-  printBHT();
-  Serial.println("----------------------------------------");
-  Serial.println();
-
-  // tftPrintTime(); 
-  // tftPrintBMP();
-  // tftPrintDHT();
-  // tftPrintBHT();
-
-  tftPrintWeather();
-   // wait for a second
-  delay(1000);
 }
 
 void tftPrintWeather() {

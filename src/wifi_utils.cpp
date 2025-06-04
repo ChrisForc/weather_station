@@ -14,13 +14,32 @@ WiFiClient wifi_client;
 void connectWifi() {
   WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
   Serial.print("Connecting to WiFi");
-  // Ahora esperamos a que cambie el estado a WL_CONNECTED:
+
+  unsigned long start = millis();
+
   while (WiFi.status() != WL_CONNECTED) {
+    if (millis() - start > WIFI_TIMEOUT) {
+      Serial.println("Connection timed out!");
+      return;
+    }
     delay(1000);
-    Serial.print(".");
+    Serial.print(".");  
   }
   Serial.println(" connected!");
 }
+
+// JsonDocument scanWifi() {
+//   Serial.println("Scanning WiFi networks...");
+//   int n = WiFi.scanNetworks();
+//   if (n == 0) {
+//     Serial.println("No networks found");
+//     return ;
+//   }
+//   else {
+    
+//   }
+// }
+
 
 void getGeoLocation(){
   if (WiFi.status() == WL_CONNECTED) {
@@ -56,6 +75,16 @@ void get1HourForecast() {
     Serial.println("WiFi not connected, cannot get 1-hour forecast.");
   }
     
+}
+
+void getSeaPressure() {
+  if (WiFi.status() == WL_CONNECTED) {
+    Serial.println("Getting sea pressure...");
+    
+  }
+  else {
+    Serial.println("WiFi not connected, cannot get sea pressure.");
+  }
 }
 
 void sendToThingSpeak(float fields[]) {
