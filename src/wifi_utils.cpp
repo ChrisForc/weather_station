@@ -10,6 +10,7 @@ float latitude = 0.0f;
 float longitude = 0.0f;
 int thingspeak_http_code = 0;
 WiFiClient wifi_client;
+// String endpoint = "https://www.googleapis.com/geolocation/v1/geolocate?key=";
 
 void connectWifi() {
   WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
@@ -19,13 +20,13 @@ void connectWifi() {
 
   while (WiFi.status() != WL_CONNECTED) {
     if (millis() - start > WIFI_TIMEOUT) {
-      Serial.println("Connection timed out!");
+      Serial.println(ANSI_RED "Connection timed out!" ANSI_RESET);
       return;
     }
     delay(1000);
     Serial.print(".");  
   }
-  Serial.println(" connected!");
+  Serial.println(ANSI_GREEN " Connected!" ANSI_RESET);
 }
 
 // JsonDocument scanWifi() {
@@ -61,7 +62,7 @@ void getGeoLocation(){
       city = String(ct);
       }
   } else {
-    Serial.println("WiFi not connected, cannot get geolocation.");
+    Serial.println(ANSI_RED "WiFi not connected, cannot get geolocation." ANSI_RESET);
   }
 }
 
@@ -72,7 +73,7 @@ void get1HourForecast() {
     http.begin("");
   }
   else {
-    Serial.println("WiFi not connected, cannot get 1-hour forecast.");
+    Serial.println(ANSI_RED "WiFi not connected, cannot get 1-hour forecast." ANSI_RESET);
   }
     
 }
@@ -83,7 +84,7 @@ void getSeaPressure() {
     
   }
   else {
-    Serial.println("WiFi not connected, cannot get sea pressure.");
+    Serial.println(ANSI_RED "WiFi not connected, cannot get sea pressure." ANSI_RESET);
   }
 }
 
@@ -94,31 +95,32 @@ void sendToThingSpeak(float fields[]) {
     }
     thingspeak_http_code = ThingSpeak.writeFields(THINGSPEAK_CHANNEL_ID, THINGSPEAK_WRITE_APIKEY);
     if(thingspeak_http_code == 200){
-      Serial.println("Channel updates successfuly sent to ThingSpeak.");
+      Serial.println(ANSI_BLUE "Channel updates successfuly sent to ThingSpeak." ANSI_RESET);
     }
     else {
-      Serial.print("Failed to send data to ThingSpeak, HTTP error code: ");
-      Serial.println(thingspeak_http_code);
+      Serial.print(ANSI_RED "Failed to send data to ThingSpeak, HTTP error code: ");
+      Serial.print(thingspeak_http_code);
+      Serial.println(ANSI_RESET);
     }
   }    
   
   else {
-    Serial.println("WiFi not connected, cannot send data to ThingSpeak.");
+    Serial.println(ANSI_RED "WiFi not connected, cannot send data to ThingSpeak." ANSI_RESET);
   }
 }
 
 bool startThingSpeak() {
   if (WiFi.status() == WL_CONNECTED) {
-    Serial.println("Starting ThingSpeak...");
+    Serial.print("Starting ThingSpeak...");
     if (!ThingSpeak.begin(wifi_client)) {
-      Serial.println("Failed to initialize ThingSpeak.");
+      Serial.println(ANSI_RED "Failed to initialize ThingSpeak." ANSI_RESET);
     } else {
-      Serial.println("ThingSpeak initialized successfully.");
+      Serial.println(ANSI_GREEN "ThingSpeak initialized successfully." ANSI_RESET);
     }
     return true;
   }
   else {
-    Serial.println("WiFi not connected, cannot start ThingSpeak.");
+    Serial.println(ANSI_RED "WiFi not connected, cannot start ThingSpeak." ANSI_RESET);
     return false;
   }
 }

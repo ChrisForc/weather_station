@@ -7,6 +7,47 @@
 #include <BH1750.h>
 #include <RTClib.h>
 #include <Wire.h>
+#include <SdFat.h>
+#include "sdios.h"
+
+extern SdFs sd;
+
+enum : uint8_t {
+    DHT22_TEMP = 0,
+    DHT22_HUM = 1,
+    DHT22_FEELS = 2,
+    BMP180_PRES = 3,
+    BMP180_ALT = 4,
+    BH1750_LUX = 5,
+};
+
+struct sensorEntry {
+    uint8_t sensor_id;
+    uint32_t timestamp;
+    float value;
+};
+
+
+/**
+ * Inicializa la tarjeta SD.
+ * Debe llamarse antes de usar cualquier función relacionada con la SD.
+ */
+void initSD();
+
+/**
+ * Agrega una entrada al buffer de sensores.
+ * Si el buffer está lleno, se volcará a la tarjeta SD.
+ * @param sensor_id ID del sensor (DHT22_TEMP, DHT22_HUM, etc.)
+ * @param value Valor del sensor a agregar al buffer
+ */
+void addToBuffer(uint8_t sensor_id, float value);
+
+/**
+ * Vuelca el buffer de sensores a la tarjeta SD.
+ * @param now (entrada) objeto DateTime con la fecha/hora actual
+ * @return true si el volcado fue exitoso; false si hubo un error.
+ */
+bool flushBufferToSD(DateTime &now);
 
 /**
  * Inicializa los sensores:

@@ -21,12 +21,13 @@ void tftPrintWeather();
 
 unsigned long ttf_timer = 0;  // borrar cuando se pase a GUI
 
-void setup()
-{
+void setup() {
   pinMode(LED_BUILTIN, OUTPUT);
   pinMode(LED_RED, OUTPUT);
   pinMode(LED_YELLOW, OUTPUT);
   pinMode(LED_GREEN, OUTPUT);
+  pinMode(SD_CS,  OUTPUT);
+  pinMode(TFT_CS, OUTPUT);
 
   Serial.begin(9600);
 
@@ -35,8 +36,14 @@ void setup()
   getGeoLocation();
   startThingSpeak();
 
+  SPI.begin();
+  // digitalWrite(SD_CS,  HIGH);
+  // digitalWrite(TFT_CS, HIGH);
+  initSD();
   tft.init(240, 320); 
   tft.setFont(&FreeSans9pt7b);
+
+
 }
 
 void loop() {
@@ -64,10 +71,10 @@ void loop() {
 
     tftPrintWeather();
   }
-
 }
 
 void tftPrintWeather() {
+  digitalWrite(SD_CS, HIGH);
   // Limpia la pantalla y desactiva el wrapping automático
   tft.fillScreen(ST77XX_BLACK);
   tft.setTextWrap(false);

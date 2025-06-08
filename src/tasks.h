@@ -7,9 +7,9 @@
 
 #define THINGSPEAK_PERIOD 15000
 #define DHT_READ_PERIOD 2000
-#define BMP_READ_PERIOD 500
-#define BH1750_READ_PERIOD 500
-#define RTC_READ_PERIOD 500
+#define BMP_READ_PERIOD 1000
+#define BH1750_READ_PERIOD 1000
+#define RTC_READ_PERIOD 1000
 
 /**
  * Tarea para leer el sensor DHT22.
