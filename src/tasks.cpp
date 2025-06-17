@@ -12,6 +12,19 @@ void taskDHT(unsigned long curr_time) {
         if (!readDHT(temp, hum, feels_like)) {
         Serial.println("Error reading DHT22");
         }
+        if (temp < 25) {
+        digitalWrite(LED_RED, LOW);
+        digitalWrite(LED_YELLOW, LOW);
+        digitalWrite(LED_GREEN, HIGH);
+        } else if (temp < 30) {
+        digitalWrite(LED_RED, LOW);
+        digitalWrite(LED_YELLOW, HIGH);
+        digitalWrite(LED_GREEN, LOW);
+        } else {
+        digitalWrite(LED_RED, HIGH);
+        digitalWrite(LED_YELLOW, LOW);
+        digitalWrite(LED_GREEN, LOW);
+        }    
     }
 }
 
@@ -26,19 +39,19 @@ void taskBH1750(unsigned long curr_time) {
     if (curr_time - BH1750_timer >= BH1750_READ_PERIOD) {
         BH1750_timer = curr_time;
         readBH1750(lux);
-        if (lux < 300) {
-        digitalWrite(LED_RED, HIGH);
-        digitalWrite(LED_YELLOW, LOW);
-        digitalWrite(LED_GREEN, LOW);
-        } else if (lux < 3000) {
-        digitalWrite(LED_RED, LOW);
-        digitalWrite(LED_YELLOW, HIGH);
-        digitalWrite(LED_GREEN, LOW);
-        } else {
-        digitalWrite(LED_RED, LOW);
-        digitalWrite(LED_YELLOW, LOW);
-        digitalWrite(LED_GREEN, HIGH);
-        }    
+        // if (lux < 300) {
+        // digitalWrite(LED_RED, HIGH);
+        // digitalWrite(LED_YELLOW, LOW);
+        // digitalWrite(LED_GREEN, LOW);
+        // } else if (lux < 3000) {
+        // digitalWrite(LED_RED, LOW);
+        // digitalWrite(LED_YELLOW, HIGH);
+        // digitalWrite(LED_GREEN, LOW);
+        // } else {
+        // digitalWrite(LED_RED, LOW);
+        // digitalWrite(LED_YELLOW, LOW);
+        // digitalWrite(LED_GREEN, HIGH);
+        // }    
     }
 }
     

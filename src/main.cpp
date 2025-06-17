@@ -4,6 +4,7 @@
 #include "wifi_utils.h"
 #include "tasks.h" 
 #include "globals.h"
+// #include "graphics.h"
 
 #include <Adafruit_GFX.h>
 #include <Adafruit_ST7789.h>
@@ -37,13 +38,12 @@ void setup() {
   startThingSpeak();
 
   SPI.begin();
-  // digitalWrite(SD_CS,  HIGH);
-  // digitalWrite(TFT_CS, HIGH);
+  digitalWrite(SD_CS,  HIGH);
+  digitalWrite(TFT_CS, HIGH);
   initSD();
   tft.init(240, 320); 
+  tft.setRotation(2); 
   tft.setFont(&FreeSans9pt7b);
-
-
 }
 
 void loop() {

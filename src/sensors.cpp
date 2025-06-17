@@ -10,7 +10,7 @@ static size_t           buffer_index = 0;
 static DateTime         rtc_now; 
 
 #define SD_FAT_TYPE 3                         // FAT16/FAT32 + exFAT
-static constexpr uint32_t SPI_SPEED = SD_SCK_MHZ(4); // Sube/baja si parpadea
+static constexpr uint32_t SPI_SPEED = SD_SCK_MHZ(1); // Sube/baja si parpadea
 SdFs sd;  
 
 void initSensors() {
@@ -24,7 +24,7 @@ void initSensors() {
     Serial.println(ANSI_YELLOW "RTC lost power, let's set the time!" ANSI_RESET);
     rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
   }
-//   rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
+  // rtc.adjust(DateTime(F(__DATE__), F(__TIME__)) + TimeSpan(0, 0, 0, 22));
 
   // BMP180
   if (!bmp.begin()) {
@@ -67,7 +67,7 @@ void initSD() {
 
     uint32_t sectors = sd.card()->sectorCount();
     uint32_t sizeMB  = (sectors + 2047) / 2048;   // 512 B * 2048 = 1 MB
-    Serial.print(F(ANSI_PURPLE "[SD] Tamaño: "));
+    Serial.print(F(ANSI_PURPLE "[SD] Size: "));
     Serial.print(sizeMB);
     Serial.println(F(" MB" ANSI_RESET));
 
@@ -166,9 +166,13 @@ bool flushBufferToSD(DateTime &now) {
       Serial.printf(ANSI_RED "Write error: expected %zu bytes, wrote %zu bytes\n" ANSI_RESET, writing, written);
       return false;
     }
-    
+    digitalWrite(LED_BUILTIN, HIGH);
     Serial.printf(ANSI_PURPLE "Flushed %zu sensor entries to %s\n" ANSI_RESET, buffer_index, file_path);
+    digitalWrite(LED_BUILTIN, LOW);
     buffer_index = 0;
+    digitalWrite(LED_BUILTIN, HIGH);
+    digitalWrite(LED_BUILTIN, LOW);
+    return true;
   }
   return false;
 }

@@ -23,11 +23,13 @@
 // #define SD_MISO 19
 
 // Wi-Fi settings
-#define WIFI_SSID     "Totalplay-BBA5"
-#define WIFI_PASSWORD "BBA5DBC89x7wCcvU"
-// #define WIFI_SSID     "Rog PC"
-// #define WIFI_PASSWORD "z6bk18.h"
-#define WIFI_TIMEOUT 15000
+// #define WIFI_SSID     "Totalplay-BBA5"
+// #define WIFI_PASSWORD "BBA5DBC89x7wCcvU"
+#define WIFI_SSID     "Rog PC"
+#define WIFI_PASSWORD "z6bk18.h"
+// #define WIFI_SSID     "Pixel_7097"
+// #define WIFI_PASSWORD "hotspotsebas"
+#define WIFI_TIMEOUT 50000
 
 
 // ANSI color codes for terminal output
